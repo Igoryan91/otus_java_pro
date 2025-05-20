@@ -2,10 +2,11 @@ package homework;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class CustomerService {
-    private final TreeMap<Customer, String> customerTreeMap =
+    private final NavigableMap<Customer, String> customerTreeMap =
             new TreeMap<>(Comparator.comparingLong(Customer::getScores));
 
     public Map.Entry<Customer, String> getSmallest() {
