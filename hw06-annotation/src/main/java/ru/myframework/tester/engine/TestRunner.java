@@ -12,6 +12,7 @@ import ru.myframework.tester.annotation.Before;
 import ru.myframework.tester.annotation.Test;
 import ru.myframework.tester.util.ReflectionHelper;
 
+@SuppressWarnings("java:S1118")
 public class TestRunner {
     private static final Logger logger = LoggerFactory.getLogger(TestRunner.class);
 
@@ -89,7 +90,7 @@ public class TestRunner {
 
     private static void logTestResults(Map<Method, Boolean> tests) {
         tests.forEach((key, value) -> {
-            if (value) {
+            if (Boolean.TRUE.equals(value)) {
                 logger.info("Test {} passed.", key.getName());
             } else {
                 logger.info("Test {} failed.", key.getName());

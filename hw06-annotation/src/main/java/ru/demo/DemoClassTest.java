@@ -4,7 +4,7 @@ import ru.myframework.tester.annotation.After;
 import ru.myframework.tester.annotation.Before;
 import ru.myframework.tester.annotation.Test;
 
-@SuppressWarnings("java:S106")
+@SuppressWarnings({"java:S106", "java:S112"})
 public class DemoClassTest {
 
     @Before
