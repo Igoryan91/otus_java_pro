@@ -34,7 +34,6 @@ public class TestRunner {
 
     private static TestClassInfo getTestClassInfo(String testClassName) {
         Class<?> clazz = ReflectionHelper.getClassByName(testClassName);
-        Object testClassInstance = ReflectionHelper.instantiate(clazz);
         Method[] methods = clazz.getDeclaredMethods();
 
         List<Method> beforeMethods = new ArrayList<>();
@@ -51,11 +50,11 @@ public class TestRunner {
             }
         }
 
-        return new TestClassInfo(testClassInstance, beforeMethods, afterMethods, testMethodsWithStatus);
+        return new TestClassInfo(clazz, beforeMethods, afterMethods, testMethodsWithStatus);
     }
 
     private static void runTests(TestClassInfo testClassInfo) {
-        Object testClassInstance = testClassInfo.getTestClassInstance();
+        Class<?> testClassInstance = testClassInfo.getTestClassInstance();
         List<Method> beforeMethods = testClassInfo.getBeforeMethods();
         List<Method> afterMethods = testClassInfo.getAfterMethods();
         Map<Method, Boolean> testMethodsWithStatus = testClassInfo.getTestMethods();
@@ -67,11 +66,12 @@ public class TestRunner {
     }
 
     private static boolean executeTestMethod(
-            Object testClassInstance, Method test, List<Method> beforeMethods, List<Method> afterMethods) {
+            Class<?> testClassInstance, Method test, List<Method> beforeMethods, List<Method> afterMethods) {
+        Object testInstance = ReflectionHelper.instantiate(testClassInstance);
 
         try {
-            invokeLifecycleMethods(testClassInstance, beforeMethods);
-            ReflectionHelper.callMethod(testClassInstance, test.getName());
+            invokeLifecycleMethods(testInstance, beforeMethods);
+            ReflectionHelper.callMethod(testInstance, test.getName());
             logger.info("Test {} passed.", test.getName());
 
             return true;
@@ -80,7 +80,7 @@ public class TestRunner {
 
             return false;
         } finally {
-            invokeLifecycleMethods(testClassInstance, afterMethods);
+            invokeLifecycleMethods(testInstance, afterMethods);
         }
     }
 
@@ -99,20 +99,20 @@ public class TestRunner {
     }
 
     static final class TestClassInfo {
-        private final Object testClassInstance;
+        private final Class<?> testClassInstance;
         private final List<Method> beforeMethods;
         private final List<Method> afterMethods;
         private final Map<Method, Boolean> testMethods;
 
         private TestClassInfo(
-                Object testClassInstance, List<Method> before, List<Method> after, Map<Method, Boolean> tests) {
+                Class<?> testClassInstance, List<Method> before, List<Method> after, Map<Method, Boolean> tests) {
             this.testClassInstance = testClassInstance;
             this.beforeMethods = before;
             this.afterMethods = after;
             this.testMethods = tests;
         }
 
-        private Object getTestClassInstance() {
+        private Class<?> getTestClassInstance() {
             return testClassInstance;
         }
 
