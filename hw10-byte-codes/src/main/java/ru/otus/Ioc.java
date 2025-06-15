@@ -3,6 +3,7 @@ package ru.otus;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,35 +33,34 @@ final class Ioc {
 
     static class DemoInvocationHandler implements InvocationHandler {
         private final Object target;
-        private final Set<String> targetMethodSignatures;
+        private final Set<Method> targetMethod;
 
         DemoInvocationHandler(Object target) {
             this.target = target;
-            this.targetMethodSignatures = Stream.of(target.getClass().getMethods())
+            this.targetMethod = Stream.of(target.getClass().getMethods())
                     .filter(method -> method.isAnnotationPresent(Log.class))
-                    .map(DemoInvocationHandler::methodSignature)
+                    .flatMap(method -> Arrays.stream(target.getClass().getInterfaces())
+                            .flatMap(iface -> {
+                                try {
+                                    return Stream.of(iface.getMethod(method.getName(), method.getParameterTypes()));
+                                } catch (NoSuchMethodException e) {
+                                    return Stream.empty();
+                                }
+                            }))
                     .collect(Collectors.toSet());
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            String signature = methodSignature(method);
-
-            if (targetMethodSignatures.contains(signature)) {
+            if (targetMethod.contains(method)) {
                 log.info("Executed method: {}, param: {}", method.getName(), args[0]);
             }
-
             return method.invoke(target, args);
         }
 
         @Override
         public String toString() {
             return "DemoInvocationHandler{" + target.getClass().getName() + "=" + target + '}';
-        }
-
-        private static String methodSignature(Method method) {
-            return method.getName() + "#"
-                    + Stream.of(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(","));
         }
     }
 }
