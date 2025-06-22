@@ -9,10 +9,7 @@ public class CountingMachineImpl implements CountingMachine {
 
     @Override
     public int countAmountBanknotes(Map<Banknote, Integer> banknotes) {
-        return banknotes.entrySet()
-                        .stream()
-                        .mapToInt(this::amountBanknotes)
-                        .sum();
+        return banknotes.entrySet().stream().mapToInt(this::amountBanknotes).sum();
     }
 
     @Override

@@ -130,9 +130,8 @@ class ATMTest {
     }
 
     private int calcSumBanknotes(Map<Banknote, Integer> banknotes) {
-        return banknotes.entrySet()
-                        .stream()
-                        .mapToInt(entry -> entry.getKey().getNominal() * entry.getValue())
-                        .sum();
+        return banknotes.entrySet().stream()
+                .mapToInt(entry -> entry.getKey().getNominal() * entry.getValue())
+                .sum();
     }
 }

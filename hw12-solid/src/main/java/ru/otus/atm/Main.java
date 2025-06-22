@@ -15,6 +15,8 @@ import ru.otus.atm.storage.StorageImpl;
 @Slf4j
 public class Main {
 
+    private static final String MESSAGE_BALANCE = "Total amount at the ATM: {}";
+
     public static void main(String[] args) {
 
         Map<Banknote, Integer> packBanknotes = new EnumMap<>(Banknote.class);
@@ -31,14 +33,14 @@ public class Main {
         storage.replenish(packBanknotes);
         ATM atm = new ATM(processor);
 
-        log.info("Total amount at the ATM: {}", (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (atm.getBalance()));
 
         atm.replenish(FIVE_THOUSAND, 1000);
         atm.replenish(THOUSAND, 1000);
         atm.replenish(HUNDRED, 1000);
         atm.replenish(FIFTY, 1000);
 
-        log.info("Total amount at the ATM: {}", (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (atm.getBalance()));
 
         Map<Banknote, Integer> packBanknotes2 = new EnumMap<>(Banknote.class);
         packBanknotes2.put(FIFTY, 2000);
@@ -51,13 +53,13 @@ public class Main {
 
         atm.replenish(packBanknotes2);
 
-        log.info("Total amount at the ATM: {}", (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (atm.getBalance()));
         atm.withdraw(15);
 
         atm.withdraw(15000000);
         atm.withdraw(15000000);
 
-        log.info("Total amount at the ATM: {}", (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (atm.getBalance()));
 
         atm.withdraw(150);
     }
