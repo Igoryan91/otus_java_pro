@@ -6,9 +6,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import ru.otus.atm.model.Banknote;
-import ru.otus.atm.processor.CountingMachineImpl;
-import ru.otus.atm.processor.Processor;
-import ru.otus.atm.processor.ProcessorImpl;
 import ru.otus.atm.storage.Storage;
 import ru.otus.atm.storage.StorageImpl;
 
@@ -29,18 +26,17 @@ public class Main {
         packBanknotes.put(FIVE_THOUSAND, 1000);
 
         Storage storage = new StorageImpl();
-        Processor processor = new ProcessorImpl(storage, new CountingMachineImpl());
-        storage.replenish(packBanknotes);
-        ATM atm = new ATM(processor);
+        ATMImpl ATMimpl = new ATMImpl(storage);
+        ATMimpl.replenish(packBanknotes);
 
-        log.info(MESSAGE_BALANCE, (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
 
-        atm.replenish(FIVE_THOUSAND, 1000);
-        atm.replenish(THOUSAND, 1000);
-        atm.replenish(HUNDRED, 1000);
-        atm.replenish(FIFTY, 1000);
+        ATMimpl.replenish(FIVE_THOUSAND, 1000);
+        ATMimpl.replenish(THOUSAND, 1000);
+        ATMimpl.replenish(HUNDRED, 1000);
+        ATMimpl.replenish(FIFTY, 1000);
 
-        log.info(MESSAGE_BALANCE, (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
 
         Map<Banknote, Integer> packBanknotes2 = new EnumMap<>(Banknote.class);
         packBanknotes2.put(FIFTY, 2000);
@@ -51,16 +47,16 @@ public class Main {
         packBanknotes2.put(TWO_THOUSAND, 1000);
         packBanknotes2.put(FIVE_THOUSAND, 2000);
 
-        atm.replenish(packBanknotes2);
+        ATMimpl.replenish(packBanknotes2);
 
-        log.info(MESSAGE_BALANCE, (atm.getBalance()));
-        atm.withdraw(15);
+        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
+        ATMimpl.withdraw(15);
 
-        atm.withdraw(15000000);
-        atm.withdraw(15000000);
+        ATMimpl.withdraw(15000000);
+        ATMimpl.withdraw(15000000);
 
-        log.info(MESSAGE_BALANCE, (atm.getBalance()));
+        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
 
-        atm.withdraw(150);
+        ATMimpl.withdraw(150);
     }
 }
