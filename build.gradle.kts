@@ -43,6 +43,7 @@ allprojects {
                 mavenBom("com.google.protobuf:protobuf-bom:$protobufBom")
             }
             dependency("com.google.guava:guava:$guava")
+            dependency("org.projectlombok:lombok:1.18.32")
         }
     }
 
