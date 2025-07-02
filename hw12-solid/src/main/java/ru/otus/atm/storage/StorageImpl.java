@@ -69,12 +69,12 @@ public class StorageImpl implements Storage {
         Map<Banknote, Integer> banknotesForAmount = new EnumMap<>(Banknote.class);
         int remainAmount = amount;
         for (Banknote banknote : Banknote.values()) {
-            if (remainAmount == 0) {
-                break;
+            if (remainAmount > 0) {
+                int banknoteCount =
+                        calcBanknoteOneDenominationForAmount(banknote, banknotes.get(banknote), remainAmount);
+                banknotesForAmount.put(banknote, banknoteCount);
+                remainAmount -= banknote.getNominal() * banknoteCount;
             }
-            int banknoteCount = calcBanknoteOneDenominationForAmount(banknote, banknotes.get(banknote), remainAmount);
-            banknotesForAmount.put(banknote, banknoteCount);
-            remainAmount -= banknote.getNominal() * banknoteCount;
         }
         checkRemainAmount(remainAmount);
         return banknotesForAmount;
