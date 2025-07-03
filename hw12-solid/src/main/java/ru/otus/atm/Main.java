@@ -26,17 +26,17 @@ public class Main {
         packBanknotes.put(FIVE_THOUSAND, 1000);
 
         Storage storage = new StorageImpl();
-        ATMImpl ATMimpl = new ATMImpl(storage);
-        ATMimpl.replenish(packBanknotes);
+        ATMImpl atmimpl = new ATMImpl(storage);
+        atmimpl.replenish(packBanknotes);
 
-        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
+        log.info(MESSAGE_BALANCE, (atmimpl.getBalance()));
 
-        ATMimpl.replenish(FIVE_THOUSAND, 1000);
-        ATMimpl.replenish(THOUSAND, 1000);
-        ATMimpl.replenish(HUNDRED, 1000);
-        ATMimpl.replenish(FIFTY, 1000);
+        atmimpl.replenish(FIVE_THOUSAND, 1000);
+        atmimpl.replenish(THOUSAND, 1000);
+        atmimpl.replenish(HUNDRED, 1000);
+        atmimpl.replenish(FIFTY, 1000);
 
-        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
+        log.info(MESSAGE_BALANCE, (atmimpl.getBalance()));
 
         Map<Banknote, Integer> packBanknotes2 = new EnumMap<>(Banknote.class);
         packBanknotes2.put(FIFTY, 2000);
@@ -47,16 +47,16 @@ public class Main {
         packBanknotes2.put(TWO_THOUSAND, 1000);
         packBanknotes2.put(FIVE_THOUSAND, 2000);
 
-        ATMimpl.replenish(packBanknotes2);
+        atmimpl.replenish(packBanknotes2);
 
-        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
-        ATMimpl.withdraw(15);
+        log.info(MESSAGE_BALANCE, (atmimpl.getBalance()));
+        atmimpl.withdraw(15);
 
-        ATMimpl.withdraw(15000000);
-        ATMimpl.withdraw(15000000);
+        atmimpl.withdraw(15000000);
+        atmimpl.withdraw(15000000);
 
-        log.info(MESSAGE_BALANCE, (ATMimpl.getBalance()));
+        log.info(MESSAGE_BALANCE, (atmimpl.getBalance()));
 
-        ATMimpl.withdraw(150);
+        atmimpl.withdraw(150);
     }
 }

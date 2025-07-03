@@ -23,38 +23,38 @@ import ru.otus.atm.storage.Storage;
 import ru.otus.atm.storage.StorageImpl;
 
 class ATMImplTest {
-    private ATMImpl ATMimpl;
+    private ATMImpl atmimpl;
     private Storage storage;
 
     @BeforeEach
     void setUp() {
         this.storage = Mockito.spy(new StorageImpl());
-        ATMimpl = new ATMImpl(this.storage);
+        atmimpl = new ATMImpl(this.storage);
     }
 
     @Test
     @DisplayName("Проверка внесения суммы разными купюрами")
     void shouldCorrectlyAcceptAmountByDifferentBanknotes() {
         Map<Banknote, Integer> packBanknotes = getPackBanknotes();
-        ATMimpl.replenish(packBanknotes);
+        atmimpl.replenish(packBanknotes);
         int sumBanknotes = calcSumBanknotes(packBanknotes);
-        assertEquals(sumBanknotes, ATMimpl.getBalance());
+        assertEquals(sumBanknotes, atmimpl.getBalance());
     }
 
     @Test
     @DisplayName("Проверка внесения суммы купюрами одного номинала")
     void shouldCorrectlyAcceptAmountByBanknotesOneNominal() {
-        ATMimpl.replenish(FIVE_THOUSAND, 1000);
+        atmimpl.replenish(FIVE_THOUSAND, 1000);
         int sumFiveThousand = FIVE_THOUSAND.getNominal() * 1000;
-        assertEquals(sumFiveThousand, ATMimpl.getBalance());
+        assertEquals(sumFiveThousand, atmimpl.getBalance());
 
-        ATMimpl.replenish(TWO_HUNDRED, 1000);
+        atmimpl.replenish(TWO_HUNDRED, 1000);
         int sumTwoHundred = TWO_HUNDRED.getNominal() * 1000;
-        assertEquals(sumFiveThousand + sumTwoHundred, ATMimpl.getBalance());
+        assertEquals(sumFiveThousand + sumTwoHundred, atmimpl.getBalance());
 
-        ATMimpl.replenish(FIFTY, 459000);
+        atmimpl.replenish(FIFTY, 459000);
         int sumFifty = FIFTY.getNominal() * 459000;
-        assertEquals(sumFiveThousand + sumTwoHundred + sumFifty, ATMimpl.getBalance());
+        assertEquals(sumFiveThousand + sumTwoHundred + sumFifty, atmimpl.getBalance());
     }
 
     @Test
@@ -62,54 +62,54 @@ class ATMImplTest {
     void shouldCorrectlyWithdrawAmount() {
         Map<Banknote, Integer> packBanknotes = getPackBanknotes();
         int banknotesSum = calcSumBanknotes(packBanknotes);
-        ATMimpl.replenish(packBanknotes);
+        atmimpl.replenish(packBanknotes);
 
         int withdrawAmount1 = 1000000;
-        ATMimpl.withdraw(withdrawAmount1);
+        atmimpl.withdraw(withdrawAmount1);
         banknotesSum -= withdrawAmount1;
-        assertEquals(banknotesSum, ATMimpl.getBalance());
+        assertEquals(banknotesSum, atmimpl.getBalance());
 
         int withdrawAmount2 = 450750;
-        ATMimpl.withdraw(withdrawAmount2);
+        atmimpl.withdraw(withdrawAmount2);
         banknotesSum -= withdrawAmount2;
-        assertEquals(banknotesSum, ATMimpl.getBalance());
+        assertEquals(banknotesSum, atmimpl.getBalance());
 
         int withdrawAmount3 = 350;
-        ATMimpl.withdraw(withdrawAmount3);
+        atmimpl.withdraw(withdrawAmount3);
         banknotesSum -= withdrawAmount3;
-        assertEquals(banknotesSum, ATMimpl.getBalance());
+        assertEquals(banknotesSum, atmimpl.getBalance());
     }
 
     @Test
     @DisplayName("Проверка ошибки снятия при недостатке средств")
     void shouldNotWithdrawAmountIfNotEnoughMoney() {
-        ATMimpl.replenish(FIFTY, 1000);
+        atmimpl.replenish(FIFTY, 1000);
         int banknotesSum = FIFTY.getNominal() * 1000;
         int withdrawAmount = banknotesSum + 1;
-        ATMimpl.withdraw(withdrawAmount);
+        atmimpl.withdraw(withdrawAmount);
         assertThrows(AmountRequestedException.class, () -> storage.withdraw(withdrawAmount));
     }
 
     @Test
     @DisplayName("Проверка ошибки снятия при недостатке каких-то банкнот")
     void shouldNotWithdrawAmountIfNotEnoughBanknotes() {
-        ATMimpl.replenish(FIFTY, 10);
-        ATMimpl.replenish(THOUSAND, 10);
+        atmimpl.replenish(FIFTY, 10);
+        atmimpl.replenish(THOUSAND, 10);
 
         int sumFifty = FIFTY.getNominal() * 10;
-        ATMimpl.withdraw(sumFifty);
+        atmimpl.withdraw(sumFifty);
 
-        assertTrue(ATMimpl.getBalance() > sumFifty);
+        assertTrue(atmimpl.getBalance() > sumFifty);
         assertThrows(AmountRequestedException.class, () -> storage.withdraw(sumFifty));
     }
 
     @Test
     @DisplayName("Проверка запрета ввода неверной суммы")
     void shouldThrowErrorWhenWithdrawAmountWithIncorrectValue() {
-        ATMimpl.withdraw(FIFTY.getNominal() - 1);
+        atmimpl.withdraw(FIFTY.getNominal() - 1);
         assertThrows(AmountRequestedException.class, () -> storage.withdraw(1));
 
-        ATMimpl.withdraw(-1);
+        atmimpl.withdraw(-1);
         assertThrows(AmountRequestedException.class, () -> storage.withdraw(-1));
     }
 
