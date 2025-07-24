@@ -101,22 +101,11 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     private void setFieldFromResultSet(T entity, Field field, ResultSet rs) {
         try {
             String columnName = field.getName();
-            Class<?> fieldType = field.getType();
-            Object value = getValueFromResultSet(rs, columnName, fieldType);
+            Object value = rs.getObject(columnName);
             field.set(entity, value);
         } catch (SQLException | IllegalAccessException e) {
             throw new DataTemplateException(e);
         }
-    }
-
-    private Object getValueFromResultSet(ResultSet rs, String columnName, Class<?> fieldType) throws SQLException {
-        return switch (fieldType.getSimpleName()) {
-            case "long", "Long" -> rs.getLong(columnName);
-            case "int", "Integer" -> rs.getInt(columnName);
-            case "String" -> rs.getString(columnName);
-            case "boolean", "Boolean" -> rs.getBoolean(columnName);
-            default -> throw new IllegalArgumentException("Нераспознанный тип поля: " + fieldType);
-        };
     }
 
     private List<Object> getFieldValuesFromEntity(T entity) {
