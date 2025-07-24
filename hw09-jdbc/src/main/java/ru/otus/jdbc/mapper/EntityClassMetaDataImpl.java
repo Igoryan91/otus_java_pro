@@ -3,6 +3,7 @@ package ru.otus.jdbc.mapper;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import ru.otus.jdbc.annotation.Id;
 
@@ -10,51 +11,51 @@ import ru.otus.jdbc.annotation.Id;
 public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     private final Class<T> entityClass;
-    private Constructor<T> constructor;
-    private Field idField;
-    private List<Field> fieldsWithoutId;
+    private final Constructor<T> constructor;
+    private final Field idField;
+    private final List<Field> fieldsWithoutId;
 
     public EntityClassMetaDataImpl(Class<T> entityClass) {
         this.entityClass = entityClass;
-        initConstructor();
-        initFields();
+        this.constructor = initConstructor();
+
+        Field[] allFields = entityClass.getDeclaredFields();
+        makeFieldsAccessible(allFields);
+
+        this.idField = initIdField(allFields);
+        this.fieldsWithoutId = initFields(allFields);
     }
 
-    private void initConstructor() {
+    private void makeFieldsAccessible(Field[] fields) {
+        Arrays.stream(fields).forEach(field -> field.setAccessible(true));
+    }
+
+    private Constructor<T> initConstructor() {
         try {
-            this.constructor = entityClass.getConstructor();
+            return entityClass.getConstructor();
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(
                     "Нет публичного конструктора без параметров для класса " + entityClass.getName(), e);
         }
     }
 
-    private void initFields() {
-        var declaredFields = entityClass.getDeclaredFields();
-        var forFieldsWithoutId = new ArrayList<Field>(declaredFields.length - 1);
-        for (Field field : declaredFields) {
-            field.setAccessible(true);
-            if (field.isAnnotationPresent(Id.class)) {
-                initIdField(field);
-            } else {
-                forFieldsWithoutId.add(field);
-            }
-        }
-        checkIdField();
-        this.fieldsWithoutId = List.copyOf(forFieldsWithoutId);
+    private List<Field> initFields(Field[] fields) {
+        return Arrays.stream(fields)
+                .filter(field -> !field.isAnnotationPresent(Id.class))
+                .toList();
     }
 
-    private void initIdField(Field field) {
-        if (this.idField != null) {
+    private Field initIdField(Field[] fields) {
+        List<Field> idFields = Arrays.stream(fields)
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .toList();
+        if (idFields.isEmpty()) {
+            throw new IllegalStateException("В классе " + entityClass.getName() + " нет поля с аннотацией @Id");
+        }
+        if (idFields.size() > 1) {
             throw new IllegalStateException("В классе " + entityClass.getName() + " несколько полей с аннотацией @Id");
         }
-        this.idField = field;
-    }
-
-    private void checkIdField() {
-        if (this.idField == null) {
-            throw new IllegalStateException("В классе " + entityClass.getName() + " не найдено поле с аннотацией @Id");
-        }
+        return idFields.getFirst();
     }
 
     @Override
