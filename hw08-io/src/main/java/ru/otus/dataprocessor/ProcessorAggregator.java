@@ -11,10 +11,7 @@ public class ProcessorAggregator implements Processor {
     @Override
     public Map<String, Double> process(List<Measurement> data) {
         return data.stream()
-                   .collect(Collectors.groupingBy(
-                       Measurement::name,
-                       LinkedHashMap::new,
-                       Collectors.summingDouble(Measurement::value)
-                   ));
+                .collect(Collectors.groupingBy(
+                        Measurement::name, LinkedHashMap::new, Collectors.summingDouble(Measurement::value)));
     }
 }
