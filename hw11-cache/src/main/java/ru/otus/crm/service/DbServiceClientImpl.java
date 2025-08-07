@@ -33,19 +33,19 @@ public class DbServiceClientImpl implements DBServiceClient {
                 var savedClient = clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
                 var savedClientCloned = savedClient.clone();
-                cache.put(savedClientCloned.getId().toString(), savedClientCloned);
+                cache.put(getKeyFromId(savedClientCloned.getId()), savedClientCloned);
                 return savedClientCloned;
             }
             var savedClient = clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", savedClient);
-            cache.put(savedClient.getId().toString(), savedClient);
+            cache.put(getKeyFromId(savedClient.getId()), savedClient);
             return savedClient;
         });
     }
 
     @Override
     public Optional<Client> getClient(long id) {
-        Client clientFromCache = cache.get(String.valueOf(id));
+        Client clientFromCache = cache.get(getKeyFromId(id));
 
         if (clientFromCache != null) {
             return Optional.of(clientFromCache);
@@ -54,7 +54,7 @@ public class DbServiceClientImpl implements DBServiceClient {
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientOptional = clientDataTemplate.findById(session, id);
             log.info("client: {}", clientOptional);
-            clientOptional.ifPresent(client -> cache.put(client.getId().toString(), client));
+            clientOptional.ifPresent(client -> cache.put(getKeyFromId(client.getId()), client));
             return clientOptional;
         });
     }
@@ -64,8 +64,12 @@ public class DbServiceClientImpl implements DBServiceClient {
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientList = clientDataTemplate.findAll(session);
             log.info("clientList:{}", clientList);
-            clientList.forEach(client -> cache.put(client.getId().toString(), client));
+            clientList.forEach(client -> cache.put(getKeyFromId(client.getId()), client));
             return clientList;
         });
+    }
+
+    private String getKeyFromId(long id) {
+        return String.valueOf(id);
     }
 }
