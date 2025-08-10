@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import ru.otus.core.sessionmanager.DataBaseOperationException;
+import ru.otus.sessionmanager.DataBaseOperationException;
 
 public class DbExecutorImpl implements DbExecutor {
 
