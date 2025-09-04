@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Работа с клиентами</title>
+    <style>
+        table {
+            width: 600px;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    </style>
+</head>
+
+<body>
+<h4>Добавить нового клиента</h4>
+<form method="post">
+    <div class="form-group">
+        <label for="name">Имя клиента:</label>
+        <div class="name-input">
+            <input type="text" id="name" name="name" required>
+        <div>
+    </div>
+            <br>
+    <div class="form-group">
+        <label for="address">Адрес:</label>
+        <div class="address-input">
+            <input type="text" id="address" name="address" required>
+        <div>
+    </div>
+            <br>
+    <div class="form-group">
+        <label>Телефон:</label>
+        <div class="phone-input">
+            <input type="tel" name="phones" placeholder="+7 (XXX) XXX-XX-XX" required>
+        </div>
+    </div>
+            <br>
+    <button type="submit">Создать клиента</button>
+</form>
+
+<h4>Список клиентов</h4>
+<table style="width: 400px">
+    <thead>
+        <tr>
+            <th style="width: 50px">Id</th>
+            <th style="width: 150px">Имя</th>
+            <th style="width: 200px">Адрес</th>
+            <th style="width: 300px">Телефоны</th>
+        </tr>
+    </thead>
+    <tbody>
+        <#list clients as client>
+            <tr>
+                <td>${client.id}</td>
+                <td>${client.name!""}</td>
+                <td>${(client.address.street)!""}</td>
+                <td>
+                    <#list client.phones as phone>
+                        ${phone.number}<#sep>,<br></#sep>
+                    </#list>
+                </td>
+            </tr>
+        </#list>
+    </tbody>
+</table>
+</body>
+</html>

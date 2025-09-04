@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.otus.core.repository.DataTemplateHibernate;
 import ru.otus.core.repository.HibernateUtils;
-import ru.otus.core.sessionmanager.TransactionManagerHibernate;
+import ru.otus.sessionmanager.TransactionManagerHibernate;
 import ru.otus.crm.dbmigrations.MigrationsExecutorFlyway;
 import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;

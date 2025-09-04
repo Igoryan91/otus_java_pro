@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.otus.core.repository.DataTemplate;
-import ru.otus.core.sessionmanager.TransactionRunner;
+import ru.otus.sessionmanager.TransactionRunner;
 import ru.otus.crm.model.Manager;
 
 public class DbServiceManagerImpl implements DBServiceManager {
