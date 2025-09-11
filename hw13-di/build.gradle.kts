@@ -1,5 +1,5 @@
 dependencies {
-//    implementation("org.reflections:reflections")
+    implementation("org.reflections:reflections:0.10.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
