@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.dto.ClientDto;
 import ru.otus.services.ClientService;
@@ -29,7 +28,7 @@ public class ClientController {
     }
 
     @PostMapping("/clients")
-    public String clientSave(@ModelAttribute ClientDto client) {
+    public String clientSave(ClientDto client) {
         clientService.save(client);
         return "redirect:/clients";
     }
