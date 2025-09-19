@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Работа с клиентами</title>
+    <style>
+        table {
+            width: 600px;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    </style>
+</head>
+
+<body>
+<h4>Добавить нового клиента</h4>
+<form id="add-form" th:method="post" th:action="@{/clients}">
+    <div class="row">
+        <label for="client-name-input">Имя клиента:</label>
+        <div class="name-input">
+            <input id="client-name-input" name="name" type="text" required/>
+        </div>
+    </div>
+        <br>
+    <div class="row">
+        <label for="address-street-input">Адрес:</label>
+        <div class="address-input">
+            <input type="text" id="address-street-input" name="address.street" required>
+        </div>
+    </div>
+        <br>
+    <div class="row">
+        <label>Телефоны:</label>
+        <div id="phones-container">
+            <div class="phone-row">
+                <input type="text" name="phones[0].number" placeholder="+7 (XXX) XXX-XX-XX" required>
+                <button type="button" class="remove-phone" onclick="removePhone(this)">×</button>
+            </div>
+        </div>
+        <button type="button" id="add-phone" onclick="addPhone()">+ Добавить телефон</button>
+    </div>
+        <br>
+    <div class="row">
+        <button type="submit">Создать клиента</button>
+    </div>
+</form>
+
+<h4>Список клиентов</h4>
+<table style="width: 400px">
+    <thead>
+        <tr>
+            <th style="width: 50px">Id</th>
+            <th style="width: 150px">Имя</th>
+            <th style="width: 200px">Адрес</th>
+            <th style="width: 300px">Телефоны</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="client : ${clients}" th:object="${client}">
+            <td th:text="*{id}"></td>
+            <td th:text="*{name}"></td>
+            <td th:text="*{address.street}"></td>
+            <td>
+            <span th:each="phone, iterStat : ${client.phones}" th:object="${phone}">
+                <span th:text="*{number}"></span>
+                <span th:unless="${iterStat.last}">, </span>
+            </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</body>
+
+<script>
+    let phoneIndex = document.querySelectorAll('.phone-row').length;
+
+    function addPhone() {
+        const container = document.getElementById('phones-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'phone-row';
+
+        newRow.innerHTML = `
+            <input type="text" name="phones[${phoneIndex}].number" placeholder="+7 (XXX) XXX-XX-XX" required>
+            <button type="button" class="remove-phone" onclick="removePhone(this)">×</button>
+        `;
+        container.appendChild(newRow);
+        phoneIndex++;
+    }
+
+    function removePhone(button) {
+        const rows = document.querySelectorAll('.phone-row');
+        if (rows.length > 1) {
+            const row = button.parentElement;
+            row.remove();
+            reindexPhones();
+        }
+    }
+
+    function reindexPhones() {
+        const rows = document.querySelectorAll('.phone-row');
+        phoneIndex = 0;
+        rows.forEach((row, index) => {
+            const input = row.querySelector('input');
+            input.name = `phones[${index}].number`;
+            phoneIndex = index + 1;
+        });
+    }
+</script>
+
+</html>
