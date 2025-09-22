@@ -13,6 +13,7 @@ include("hw11-cache")
 include("hw12-web")
 include("hw13-di")
 include("hw14-data-jdbc")
+include("hw16-concurrent-queue")
 
 pluginManagement {
     val jgitver: String by settings
