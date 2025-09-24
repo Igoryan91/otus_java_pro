@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.otus.api.SensorDataProcessor;
@@ -17,7 +16,6 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
     private final PriorityBlockingQueue<SensorData> dataBuffer;
-    private final AtomicBoolean flushing = new AtomicBoolean(false);
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
@@ -35,24 +33,17 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
     }
 
     public void flush() {
-        if (!flushing.compareAndSet(false, true)) {
-            return;
-        }
-
-        if (dataBuffer.isEmpty()) {
-            flushing.set(false);
-            return;
-        }
-
         List<SensorData> bufferedData = new ArrayList<>();
         dataBuffer.drainTo(bufferedData);
+
+        if (bufferedData.isEmpty()) {
+            return;
+        }
 
         try {
             writer.writeBufferedData(bufferedData);
         } catch (Exception e) {
             log.error("Ошибка в процессе записи буфера", e);
-        } finally {
-            flushing.set(false);
         }
     }
 
