@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package ru.otus.protobuf;
+
+option java_multiple_files = true;
+
+message RequestMessage  {
+    int64 firstValue = 1;
+    int64 lastValue = 2;
+}
+
+message ResponseMessage  {
+    int64 resultValue = 1;
+}
+
+message Empty {}
+
+service NumberService {
+    rpc processNumber(RequestMessage ) returns (stream ResponseMessage );
+}
