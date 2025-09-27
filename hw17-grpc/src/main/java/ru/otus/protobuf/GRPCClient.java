@@ -4,9 +4,13 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({"squid:S106", "squid:S2142"})
 public class GRPCClient {
+
+    private static final Logger log = LoggerFactory.getLogger(GRPCClient.class.getName());
 
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8190;
@@ -20,8 +24,7 @@ public class GRPCClient {
                 .build();
 
         var stub = NumberServiceGrpc.newStub(channel);
-        var reqNumberMsg =
-                RequestMessage.newBuilder().setFirstValue(0).setLastValue(30).build();
+        var reqNumberMsg = RequestMessage.newBuilder().setFirstValue(0).setLastValue(30).build();
 
         var latch = new CountDownLatch(1);
         AtomicLong serverValue = new AtomicLong(0);
@@ -30,17 +33,17 @@ public class GRPCClient {
             @Override
             public void onNext(ResponseMessage respNumberMsg) {
                 serverValue.set(respNumberMsg.getResultValue());
-                System.out.printf("serverValue: %d%n", respNumberMsg.getResultValue());
+                log.info("serverValue: {}", respNumberMsg.getResultValue());
             }
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("Провал: " + t.getMessage());
+                log.info("Провал: {}", t.getMessage());
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("\n\nЯ все!");
+                log.info("Я все!");
                 latch.countDown();
             }
         });
@@ -52,17 +55,19 @@ public class GRPCClient {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                System.err.println(e.getMessage());
+                log.error(e.getMessage());
             }
 
             currentValue++;
 
-            if (lastServerValue != serverValue.get()) {
-                currentValue += serverValue.get();
+            long currentServerValue = serverValue.get();
+
+            if (lastServerValue != currentServerValue) {
+                currentValue += currentServerValue;
             }
 
-            lastServerValue = serverValue.get();
-            System.out.printf("currentValue: %d%n", currentValue);
+            lastServerValue = currentServerValue;
+            log.info("currentValue: {}", currentValue);
         }
 
         latch.await();

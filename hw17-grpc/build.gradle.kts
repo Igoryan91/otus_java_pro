@@ -11,6 +11,7 @@ val grpc: String by project
 val grpcProtobuf: String by project
 
 dependencies {
+    implementation ("ch.qos.logback:logback-classic")
     implementation("io.grpc:grpc-netty:$grpc")
     implementation("io.grpc:grpc-protobuf:$grpc")
     implementation("io.grpc:grpc-stub:$grpc")
