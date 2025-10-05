@@ -24,7 +24,8 @@ public class GRPCClient {
                 .build();
 
         var stub = NumberServiceGrpc.newStub(channel);
-        var reqNumberMsg = RequestMessage.newBuilder().setFirstValue(0).setLastValue(30).build();
+        var reqNumberMsg =
+                RequestMessage.newBuilder().setFirstValue(0).setLastValue(30).build();
 
         var latch = new CountDownLatch(1);
         AtomicLong serverValue = new AtomicLong(0);
@@ -49,7 +50,6 @@ public class GRPCClient {
         });
 
         long currentValue = 0;
-        long lastServerValue = 0;
 
         for (int i = START; i <= END; i++) {
             try {
@@ -58,15 +58,7 @@ public class GRPCClient {
                 log.error(e.getMessage());
             }
 
-            currentValue++;
-
-            long currentServerValue = serverValue.get();
-
-            if (lastServerValue != currentServerValue) {
-                currentValue += currentServerValue;
-            }
-
-            lastServerValue = currentServerValue;
+            currentValue = currentValue + serverValue.getAndSet(0) + 1;
             log.info("currentValue: {}", currentValue);
         }
 
