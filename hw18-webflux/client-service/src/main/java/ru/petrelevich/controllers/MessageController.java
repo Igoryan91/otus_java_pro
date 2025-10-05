@@ -23,6 +23,8 @@ public class MessageController {
 
     private static final String TOPIC_TEMPLATE = "/topic/response.";
 
+    private static final String SPECIAL_ROOM = "1408";
+
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
 
@@ -33,11 +35,20 @@ public class MessageController {
 
     @MessageMapping("/message.{roomId}")
     public void getMessage(@DestinationVariable("roomId") String roomId, Message message) {
+        if (SPECIAL_ROOM.equals(roomId)) {
+            logger.info("Don't stay in 1408");
+            return;
+        }
+
         logger.info("get message:{}, roomId:{}", message, roomId);
         saveMessage(roomId, message).subscribe(msgId -> logger.info("message send id:{}", msgId));
 
         template.convertAndSend(
                 String.format("%s%s", TOPIC_TEMPLATE, roomId), new Message(HtmlUtils.htmlEscape(message.messageStr())));
+
+        template.convertAndSend(
+                String.format("%s%s", TOPIC_TEMPLATE, SPECIAL_ROOM),
+                new Message(HtmlUtils.htmlEscape(message.messageStr())));
     }
 
     @EventListener
@@ -58,7 +69,14 @@ public class MessageController {
             return;
         }
         logger.info("subscription for:{}, roomId:{}, user:{}", simpDestination, roomId, principal.getName());
-        // /user/f6532733-51db-4d0e-bd00-1267dddc7b21/topic/response.1
+
+        if (roomId == Long.parseLong(SPECIAL_ROOM)) {
+            getAllMessages()
+                    .doOnError(ex -> logger.error("getting messages for roomId:{} failed", roomId, ex))
+                    .subscribe(message -> template.convertAndSend(simpDestination, message));
+            return;
+        }
+
         getMessagesByRoomId(roomId)
                 .doOnError(ex -> logger.error("getting messages for roomId:{} failed", roomId, ex))
                 .subscribe(message -> template.convertAndSendToUser(principal.getName(), simpDestination, message));
@@ -87,6 +105,20 @@ public class MessageController {
         return datastoreClient
                 .get()
                 .uri(String.format("/msg/%s", roomId))
+                .accept(MediaType.APPLICATION_NDJSON)
+                .exchangeToFlux(response -> {
+                    if (response.statusCode().equals(HttpStatus.OK)) {
+                        return response.bodyToFlux(Message.class);
+                    } else {
+                        return response.createException().flatMapMany(Mono::error);
+                    }
+                });
+    }
+
+    private Flux<Message> getAllMessages() {
+        return datastoreClient
+                .get()
+                .uri("/msg")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchangeToFlux(response -> {
                     if (response.statusCode().equals(HttpStatus.OK)) {
