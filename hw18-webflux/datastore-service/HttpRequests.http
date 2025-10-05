@@ -1,0 +1,12 @@
+###
+POST http://localhost:8081/msg/2
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "messageStr": "qqqq"
+}
+
+###
+GET http://localhost:8081/msg/2
